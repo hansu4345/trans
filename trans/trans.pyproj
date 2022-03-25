@@ -53,9 +53,13 @@
     <Folder Include="app\static\app\scripts\" />
     <Folder Include="app\templates\" />
     <Folder Include="app\templates\app\" />
+    <Folder Include="Properties\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="trans\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\web.config" />
+    <None Include="Properties\PublishProfiles\translator-jnu - Web Deploy.pubxml" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />
@@ -86,6 +90,7 @@
     <Content Include="app\templates\app\layout.html" />
     <Content Include="app\templates\app\login.html" />
     <Content Include="app\templates\app\loginpartial.html" />
+    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.html">
