@@ -2,8 +2,17 @@
 
 {% block content %}
 
-<h2>ok</h2>
+<h2>번역 추천 시스템</h2>
 
-<p>Use this area ��to provide additional information.</p>
+<p>번역할 문장을 입력하세요.</p>
+
+<form action="{% url 'result' %}">
+    <textarea cola="40" rows="10" name="totaltext"></textarea>
+    <input type="submit" value="translate">
+</form>
+
+<p></p>
+{{user_chat}}
+{{user_name}}
 
 {% endblock %}
