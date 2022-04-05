@@ -8,9 +8,25 @@
 
 <form action="{% url 'result' %}">
     <textarea cola="40" rows="10" name="totaltext"></textarea>
-    <input type="submit" value="translate">
+
+    <p>출발언어
+    <select name="source">
+        <option value="ko">한국어</option>
+        <option value="en">영어</option>
+    </select>
+    </p>
+
+    <p>도착언어
+    <select name="target">
+        <option value="ko">한국어</option>
+        <option value="en">영어</option>
+    </select>
+    </p>
+
+    <input type="submit" value="번역하기">
 </form>
 
+<br />
 <p>
 {{user_chat}}
 </p>

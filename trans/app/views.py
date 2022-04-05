@@ -29,8 +29,8 @@ def home(request):
 
 def result(request):
     input_text = request.GET['totaltext'] #문장변수1
-    input_source = "ko"
-    input_target = "en"
+    input_source = request.GET['source']
+    input_target = request.GET['target']
     #input_source = request.GET['source'] #원본언어변수
     #input_target = request.GET['target'] #도착언어변수
 
