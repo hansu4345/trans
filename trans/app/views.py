@@ -10,10 +10,19 @@ import urllib.request
 import json
 import googletrans
 import kakaotrans
+import numpy as np
 
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpRequest
+
+from difflib import SequenceMatcher
+
+from numpy import dot
+from numpy.linalg import norm
+from konlpy.tag import Okt #한국어 형태소 분석
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 
 def home(request):
     """Renders the home page."""
@@ -29,10 +38,8 @@ def home(request):
 
 def result(request):
     input_text = request.GET['totaltext'] #번역할문장
-    input_source = request.GET['source']
-    input_target = request.GET['target']
-    #input_source = request.GET['source'] #원본언어변수
-    #input_target = request.GET['target'] #도착언어변수
+    input_source = request.GET['source'] #원본언어변수
+    input_target = request.GET['target'] #도착언어변수
 
     #파파고 번역된문장(문장변수2)
     papago_json_2 = papago(input_text,input_source,input_target)
@@ -42,22 +49,69 @@ def result(request):
     papago_json_3 = papago(papago_result_2,input_target,input_source)
     papago_jsonObject_3 = json.loads(papago_json_3)
     papago_result_3 = papago_jsonObject_3.get("message").get("result").get("translatedText")
-
-    #이후 input_text와 papago_result_3 일치율 체크
-
    
     #구글 번역된문장(문장변수2)
     google_result_2 = google(input_text,input_source,input_target)
     #구글 역번역문장(문장변수3)
     google_result_3 = google(google_result_2,input_target,input_source)
 
-
     #카카오 번역된문장(문장변수2)
     kakao_result_2 = kakao(input_text,input_source,input_target)
     #카카오 역번역문장(문장변수3)
     kakao_result_3 = kakao(kakao_result_2,input_target,input_source)
+  
+
+    #이후 input_text(번역할문장)와 *_result_3(역번역문장)의 일치율 체크
+
+    #한 자씩 단순비교, difflib-SequenceMatcher
+    match_rate_papago = f'{SequenceMatcher(None, input_text, papago_result_3).ratio()*100:.1f}%'
+    match_rate_google = f'{SequenceMatcher(None, input_text, google_result_3).ratio()*100:.1f}%'
+    match_rate_kakao = f'{SequenceMatcher(None, input_text, kakao_result_3).ratio()*100:.1f}%'
 
 
+    #코사인 유사도, 한->영
+    if input_source == 'ko':
+        okt = Okt()
+        v_in = okt.nouns(input_text)
+        v_papago = okt.nouns(papago_result_3)
+        v_google = okt.nouns(google_result_3)
+        v_kakao = okt.nouns(kakao_result_3)
+
+        v_set = v_in + v_papago + v_google + v_kakao
+        feats = set(v_set)
+
+        v_in_arr = np.array(make_matrix(feats, v_in))
+        v_papago_arr = np.array(make_matrix(feats, v_papago))
+        v_google_arr = np.array(make_matrix(feats, v_google))
+        v_kakao_arr = np.array(make_matrix(feats, v_kakao))
+
+        cs_papago = cos_sim(v_in_arr, v_papago_arr)
+        cs_google = cos_sim(v_in_arr, v_google_arr)
+        cs_kakao = cos_sim(v_in_arr, v_kakao_arr)
+
+
+    #코사인 유사도, 영->한
+    elif input_source == 'en':
+        doc_list = [input_text, papago_result_3, google_result_3, kakao_result_3]
+
+        tfidf_vect_simple = TfidfVectorizer()
+        feature_vect_simple = tfidf_vect_simple.fit_transform(doc_list)
+ 
+        feature_vect_dense = feature_vect_simple.todense()
+
+        vect1 = np.array(feature_vect_dense[0]).reshape(-1,)
+        vect2 = np.array(feature_vect_dense[1]).reshape(-1,)
+        vect3 = np.array(feature_vect_dense[2]).reshape(-1,)
+        vect4 = np.array(feature_vect_dense[3]).reshape(-1,)
+
+        cs_papago = cos_sim(vect1, vect2)
+        cs_google = cos_sim(vect1, vect3)
+        cs_kakao = cos_sim(vect1, vect4)
+
+
+
+
+    #렌더
     return render(request, 'app/result.html', 
         {
             'papago': papago_result_2,
@@ -68,6 +122,15 @@ def result(request):
 
             'kakao': kakao_result_2,
             'kakao_reverse': kakao_result_3,
+
+            'papago_match':match_rate_papago,
+            'google_match':match_rate_google,
+            'kakao_match':match_rate_kakao,
+
+            'papago_cs':cs_papago,
+            'google_cs':cs_google,
+            'kakao_cs':cs_kakao,
+
         }
     ) 
 
@@ -118,3 +181,18 @@ def kakao(input_text,input_source,input_target):
 
     kakao_result = kakaotrans.Translator().translate(kakao_text, src=kakao_source, tgt=kakao_target)
     return kakao_result
+
+#코사인 유사도를 구하는 함수
+def cos_sim(a, b):
+    return dot(a, b)/(norm(a)*norm(b))
+
+# 기준이 되는 키워드와 벡터 키워드 리스트를 받아서 키워드별 빈도를 구하는 함수 
+def make_matrix(feats, list_data): 
+    freq_list = [] 
+    for feat in feats: 
+        freq = 0 
+        for word in list_data:
+           if feat == word: 
+               freq += 1
+        freq_list.append(freq) 
+    return freq_list
