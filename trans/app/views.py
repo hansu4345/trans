@@ -28,11 +28,9 @@ def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
 
-    chat = '안녕하세요'
-
     return render(request, 'app/index.html',
         {
-            'user_chat':chat,
+            
         }
     )
 
@@ -109,11 +107,80 @@ def result(request):
         cs_kakao = cos_sim(vect1, vect4)
 
 
+    #순위
+    if cs_papago >= cs_google and cs_papago > cs_kakao :
+        one_name = "파파고 번역"
+        one_trans = papago_result_2
+        one_reverse = papago_result_3
+        if cs_google > cs_kakao :
+            two_name = "구글 번역"
+            two_trans = google_result_2
+            two_reverse = google_result_3
+            three_name = "카카오 번역"
+            three_trans = kakao_result_2
+            three_reverse = kakao_result_3
+        else :
+            two_name = "카카오 번역"
+            two_trans = kakao_result_2
+            two_reverse = kakao_result_3
+            three_name = "구글 번역"
+            three_trans = google_result_2
+            three_reverse = google_result_3
+
+    if cs_google > cs_papago and cs_google >= cs_kakao :
+        one_name = "구글 번역"
+        one_trans = google_result_2
+        one_reverse = google_result_3
+        if cs_papago > cs_kakao :
+            two_name = "파파고 번역"
+            two_trans = papago_result_2
+            two_reverse = papago_result_3
+            three_name = "카카오 번역"
+            three_trans = kakao_result_2
+            three_reverse = kakao_result_3
+        else :
+            two_name = "카카오 번역"
+            two_trans = kakao_result_2
+            two_reverse = kakao_result_3
+            three_name = "파파고 번역"
+            three_trans = papago_result_2
+            three_reverse = papago_result_3
+
+    if cs_kakao >= cs_papago and cs_kakao > cs_google :
+        one_name = "카카오 번역"
+        one_trans = kakao_result_2
+        one_reverse = kakao_result_3
+        if cs_papago > cs_google :
+            two_name = "파파고 번역"
+            two_trans = papago_result_2
+            two_reverse = papago_result_3
+            three_name = "구글 번역"
+            three_trans = google_result_2
+            three_reverse = google_result_3
+        else :
+            two_name = "구글 번역"
+            two_trans = google_result_2
+            two_reverse = google_result_3
+            three_name = "파파고 번역"
+            three_trans = papago_result_2
+            three_reverse = papago_result_3
 
 
     #렌더
     return render(request, 'app/result.html', 
         {
+            '1st_name': one_name,
+            '1st_trans': one_trans,
+            '1st_reverse': one_reverse,
+            
+            '2nd_name': two_name,
+            '2nd_trans': two_trans,
+            '2nd_reverse': two_reverse,
+            
+            '3rd_name': three_name,
+            '3rd_trans': three_trans,
+            '3rd_reverse': three_reverse,
+
             'papago': papago_result_2,
             'papago_reverse': papago_result_3,
 
