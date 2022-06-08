@@ -64,6 +64,9 @@
     <None Include="Properties\PublishProfiles\trans20220511235107 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\trans20220511235107 - Web Deploy1.pubxml" />
     <None Include="Properties\PublishProfiles\trans20220517183834 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\trans20220529140416 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\trans20220529144325 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\jnu-translator - Web Deploy.pubxml" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />

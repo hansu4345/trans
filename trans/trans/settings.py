@@ -25,7 +25,7 @@ SECRET_KEY = '62207266-40ba-403d-aa7b-921b3f35cc54'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['trans20220517183834.azurewebsites.net']
+ALLOWED_HOSTS = ['jnu-translator.azurewebsites.net']
 
 # Application references
 # https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-INSTALLED_APPS
